@@ -5,3 +5,21 @@
 body {
   background-color: rgb(241, 245, 241);
 }
+
+.nav-link {
+  @apply relative font-bold text-slate-700;
+}
+
+.nav-link::after {
+  @apply absolute block w-full bg-slate-700 h-0.5 scale-x-0;
+  content: "";
+  bottom: -1px;
+  left: 0;
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+
+.nav-link:hover::after {
+  @apply scale-x-100;
+  transform-origin: bottom left;
+}
