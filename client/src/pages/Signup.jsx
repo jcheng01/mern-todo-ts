@@ -1,20 +1,100 @@
 import { useState } from "react";
 import { NavBar } from "../components/NavBar";
+import { Link, useNavigate } from "react-router-dom";
 
 function Signup() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    confirmEmail: "",
     password: "",
+    confirmPW: "",
   });
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [confirmemailError, setConfirmEmailError] = useState("");
+  const [confirmpwError, setConfirmpwError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  //   const handleSubmit = async (e) => {
+  //     console.log(formData);
+  //     e.preventDefault();
+  //     try {
+  //       setLoading(true);
+  //       const res = await fetch("/api/users/signup", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(formData),
+  //       });
+  //       const datajson = await res.json();
+  //       //   console.log(datajson);
+  //       //   console.log(JSON.stringify(data));
+  //       if (datajson.ok === true) {
+  //         console.log("Login successful:", data.statusText);
+  //         // setMessage("Login successful!");
+  //         // You might handle navigation or store a token here
+  //       }
+  //       setLoading(false);
+  //       navigate("/");
+  //     } catch (error) {
+  //       setLoading(false);
+  //       console.log("Login error:", error);
+  //       //   setMessage("Login failed. Please try again.");
+  //     }
+  //   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(typeof formData);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      console.log(JSON.stringify(formData));
+      if (!res.ok) {
+        // If the server response is not ok, log the error and return
+        console.error(
+          "Server responded with an error:",
+          res.status,
+          res.statusText
+        );
+        // Optionally, you can handle different status codes here
+        // setMessage('Signup failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Assuming the server responds with JSON
+      const datajson = await res.json();
+
+      if (datajson.ok === true) {
+        console.log("Signup successful:", datajson.message);
+        // setMessage('Signup successful!');
+        // Handle successful signup here (e.g., navigation, token storage)
+        navigate("/");
+      } else {
+        // Handle specific error messages from the server
+        console.error("Signup error:", datajson.message);
+        // setMessage(datajson.message || 'Signup failed. Please try again.');
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      // setMessage('An error occurred during signup. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlenameBlur = (e) => {
@@ -46,18 +126,22 @@ function Signup() {
       setPasswordError("");
     }
   };
-  const handleconfirmemailBlur = (e) => {
-    if (e.target.value !== formData.email) {
-      setConfirmEmailError("Emails should match");
+  const handleconfirmpwBlur = (e) => {
+    console.log(formData, e.target.value);
+    if (e.target.value !== formData.password) {
+      setConfirmpwError("Passwords should match");
     } else {
-      setConfirmEmailError("");
+      setConfirmpwError("");
     }
   };
 
   return (
     <>
       <NavBar />
-      <form className="flex flex-col items-center justify-center h-screen">
+      <form
+        className="flex flex-col items-center justify-center h-screen"
+        onSubmit={handleSubmit}
+      >
         <h1 className="text-2xl font-bold mb-5 text-slate-600">Sign Up</h1>
         <div className="mb-2">
           <label
@@ -104,27 +188,6 @@ function Signup() {
         </div>
         <div className="mb-4">
           <label
-            htmlFor="confirmEmail"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Confirm Email
-          </label>
-          <input
-            type="email"
-            id="confirmEmail"
-            required
-            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 ${
-              confirmemailError && "border-red-500"
-            }`}
-            placeholder="jcheng01@syr.edu"
-            onChange={handleChange}
-            onBlur={handleconfirmemailBlur}
-          />
-          <p className="text-red-500 text-xs italic h-4">{confirmemailError}</p>
-        </div>
-
-        <div className="mb-6">
-          <label
             htmlFor="password"
             className="block text-gray-700 text-sm font-bold mb-2"
           >
@@ -142,6 +205,27 @@ function Signup() {
             onBlur={handlepasswordBlur}
           />
           <p className="text-red-500 text-xs italic h-4">{passwordError}</p>
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="confirmPW"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            id="confirmPW"
+            required
+            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 ${
+              confirmpwError && "border-red-500"
+            }`}
+            placeholder="confirmPW"
+            onChange={handleChange}
+            onBlur={handleconfirmpwBlur}
+          />
+          <p className="text-red-500 text-xs italic h-4">{confirmpwError}</p>
         </div>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

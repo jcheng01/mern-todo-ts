@@ -5,10 +5,10 @@ const signup = async (req, res) => {
   // console.log(req.body);
   const usersModel = mongoose.model("Users");
 
-  const { email, name, password, confirmPW } = req.body;
+  const { email, username, password, confirmPW } = req.body;
 
   // Validations\
-  if (!name) throw "No name";
+  if (!username) throw "No name";
   if (!password) throw "No password";
   if (password !== confirmPW) throw "Passwords do not match";
   if (password.length < 5) throw "Password too short";
@@ -19,7 +19,7 @@ const signup = async (req, res) => {
   const hashedPW = await bcrypt.hash(password, 6);
 
   const createdUser = await usersModel.create({
-    name,
+    username,
     email,
     password: hashedPW,
   });
@@ -28,7 +28,7 @@ const signup = async (req, res) => {
     status: "success on register",
     user: {
       id: createdUser._id,
-      name: createdUser.name,
+      username: createdUser.username,
       email: createdUser.email,
     },
   });

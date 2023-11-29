@@ -28,7 +28,7 @@ app.use("/api/users", userRoutes);
 
 app.use(errorHandler); //error handling middleware
 
-const port = 8000;
+const port = 5173;
 app.listen(port, () => {
   console.log(`Server started on port ${port}!`);
 });
